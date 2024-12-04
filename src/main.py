@@ -45,7 +45,6 @@ async def main():
 
         confirm = input("Is the information correct? (y/n): ").strip().lower()
         if confirm == 'y':
-            print("\n- All inputs are confirmed.")
             break
         elif confirm == 'n':
             print("\nWhich parameter would you like to change?")
