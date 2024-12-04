@@ -1,6 +1,7 @@
 import logging
 import asyncio
 from input import load_config_input, manual_input
+from download import download_all_media
 
 # Configure logging
 logging.basicConfig(
@@ -20,15 +21,17 @@ async def main():
         try:
             choice = int(input("Enter the option number: ").strip())
             if choice == 1:
-                await load_config_input()
+                group_name, start_date_obj, end_date_obj, save_path = load_config_input()
                 break
             elif choice == 2:
-                await manual_input()
+                group_name, start_date_obj, end_date_obj, save_path = manual_input()
                 break
             else:
                 print("- Error: Invalid option.")
         except ValueError:
             print("- Error: Please enter a valid number.\n")
+
+    # await download_all_media(group_name, start_date_obj, end_date_obj, save_path)
 
 if __name__ == "__main__":
     asyncio.run(main())
