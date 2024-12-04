@@ -6,6 +6,8 @@
 .venv/*
 !.venv/README.md
 
+.env
+
 #########
 # MacOS #
 #########
