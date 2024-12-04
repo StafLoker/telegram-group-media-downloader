@@ -15,7 +15,8 @@ __pycache__
 # Other
 *.session
 *.log
-
+data/*
+!data/README.md
 
 #########
 # MacOS #
