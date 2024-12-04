@@ -31,7 +31,7 @@ async def main():
         except ValueError:
             print("- Error: Please enter a valid number.\n")
 
-    # await download_all_media(group_name, start_date_obj, end_date_obj, save_path)
+    await download_all_media(group_name, start_date_obj, end_date_obj, save_path)
 
 if __name__ == "__main__":
     asyncio.run(main())
