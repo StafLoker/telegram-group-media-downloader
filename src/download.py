@@ -27,7 +27,7 @@ async def download_media(message, save_path):
                     return 1
     except Exception as e:
         print(f"Error downloading media from message ID {message.id}: {e}")
-        logging.debug(f"Error downloading media from message ID {message.id}: {e}")
+        logging.error(f"Error downloading media from message ID {message.id}: {e}")
     return 0
 
 
