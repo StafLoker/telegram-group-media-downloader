@@ -2,10 +2,15 @@ import asyncio
 from telethon.sync import TelegramClient
 from telethon.tl.types import DocumentAttributeVideo
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 # Set up Telegram API credentials
-api_id = TELEGRAM_API_KEY  #put you telegram API key here
-api_hash = 'TELEGRAM_API_HASH' #put yout telegram API hash here
-client = TelegramClient('session_name', api_id, api_hash)
+api_id = os.getenv('API_ID')
+api_hash = os.getenv('API_HASH')
+client = TelegramClient('group_uk', api_id, api_hash)
 
 # Define a function to download media files
 async def download_media(message):
