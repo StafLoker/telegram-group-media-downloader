@@ -1,6 +1,17 @@
+import logging
+import asyncio
 from datetime import datetime, timedelta
 from validation import *
-from download import *
+from download import download_all_media
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("telegram_download.log")
+    ]
+)
 
 def display_results(group_name, start_date, end_date, save_path):
     """Display the current inputs for user confirmation."""
