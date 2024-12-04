@@ -1,3 +1,6 @@
+import os
+from datetime import datetime
+
 def validate_group_name():
     """Prompt the user for a group name and validate that it's not empty."""
     while True:
