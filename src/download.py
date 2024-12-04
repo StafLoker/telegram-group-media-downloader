@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # Load environment variables
-load_dotenv(dotenv_path = Path('../.env'))
+load_dotenv()
 
 # Set up Telegram API credentials
 api_id = os.getenv('API_ID')
