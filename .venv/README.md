@@ -28,8 +28,3 @@ On Linux:
 ## Delete a Virtual Environment
 
 `rm -rf telegram-download-media-group-env`
-
-
-# Libraries
-
-- `pip install python-telegram-bot`
