@@ -25,7 +25,7 @@ def update_parameters(choice, group_name, start_date, end_date, save_path):
             print("- Error: End date must be after or equal to the start date.")
     elif choice == 4:
         save_path = validate_save_path()
-    return group_name, start_date, end_date, save_path
+    return group_name, start_date, start_date_obj, end_date, end_date_obj, save_path
     
 
 # Main program
@@ -55,7 +55,7 @@ async def main():
             try:
                 choice = int(input("Enter the number of the parameter to change: ").strip())
                 if choice in {1, 2, 3, 4}:
-                    group_name, start_date, end_date, save_path = update_parameters(
+                    group_name, start_date, start_date_obj, end_date, end_date_obj, save_path = update_parameters(
                         choice, group_name, start_date, end_date, save_path)
                 else:
                     print("- Error: Invalid choice. Please select a valid option.")
@@ -64,7 +64,7 @@ async def main():
         else:
             print("- Error: Please enter 'y' or 'n'.")
 
-    ## await download_all_media(group_name, start_date, end_date, save_path)
+    await download_all_media(group_name, start_date_obj, end_date_obj, save_path)
 
 
 if __name__ == "__main__":

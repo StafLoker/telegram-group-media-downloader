@@ -32,7 +32,7 @@ async def download_media(message, save_path):
 
 
 # Main function to download all media files
-async def download_all_media(group_name, start_date, end_date, base_path):
+async def download_all_media(group_name, start_date_obj, end_date_obj, base_path):
     try:
         await client.start()
 
@@ -41,12 +41,9 @@ async def download_all_media(group_name, start_date, end_date, base_path):
 
         # Create base directory
         today = datetime.now().strftime('%d-%m-%Y')
-        folder_name = f"download-group-{group_name}-{today}-s-{start_date}-f-{end_date}"
+        folder_name = f"download-group-{group_name}-{today}-s-{start_date}-e-{end_date}"
         base_dir = os.path.join(base_path, folder_name)
         os.makedirs(base_dir, exist_ok=True)
-
-        start_date_obj = datetime.strptime(start_date, '%d-%m-%Y')
-        end_date_obj = datetime.strptime(end_date, '%d-%m-%Y')
 
         total_downloaded = 0
 
