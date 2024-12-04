@@ -1,3 +1,11 @@
+###########
+# Project #
+###########
+
+# Virtual environment
+.venv/*
+!.venv/README.md
+
 #########
 # MacOS #
 #########
