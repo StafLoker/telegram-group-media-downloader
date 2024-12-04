@@ -6,10 +6,15 @@
 .venv/*
 !.venv/README.md
 
+# Environments
 .env
 
 # Byte-compiled / optimized / DLL files
 __pycache__
+
+
+# Other
+*.session
 
 #########
 # MacOS #
