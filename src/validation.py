@@ -2,7 +2,9 @@ import os
 from datetime import datetime
 
 def validate_group_name():
-    """Prompt the user for a group name and validate that it's not empty."""
+    """
+    Prompt the user for a group name and validate that it's not empty.
+    """
     while True:
         group_name = input("Enter the group name: ").strip()
         if group_name:
@@ -11,7 +13,9 @@ def validate_group_name():
 
 
 def validate_date(prompt):
-    """Prompt the user for a date and validate the format is 'dd-mm-yyyy'."""
+    """
+    Prompt the user for a date and validate the format is 'dd-mm-yyyy'.
+    """
     while True:
         date_input = input(prompt).strip()
         try:
@@ -22,7 +26,9 @@ def validate_date(prompt):
 
 
 def validate_save_path():
-    """Prompt the user for a directory path and validate it exists."""
+    """
+    Prompt the user for a directory path and validate it exists.
+    """
     while True:
         save_path = input("Enter the directory path where files should be saved: ").strip()
         if os.path.isdir(save_path):
