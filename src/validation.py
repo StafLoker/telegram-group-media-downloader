@@ -19,8 +19,7 @@ def validate_date(prompt):
     while True:
         date_input = input(prompt).strip()
         try:
-            date_obj = datetime.strptime(date_input, '%d-%m-%Y')
-            return date_input, date_obj
+            return datetime.strptime(date_input, '%d-%m-%Y')
         except ValueError:
             print("- Error: Invalid date format. Please use 'dd-mm-yyyy'.")
 
