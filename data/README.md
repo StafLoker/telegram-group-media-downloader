@@ -13,7 +13,6 @@
 ```
 3. Add configs
    **Required fields**:
-   - `id`
    - `description`
    - `config`
      - At least one parameter
