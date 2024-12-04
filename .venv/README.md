@@ -11,7 +11,7 @@ On Linux:
 
 ## Activate the Virtual Environment
 - Assuming you are already in the project root
-`source venv/telegram-download-media-group-env/bin/activate`
+`source .venv/telegram-download-media-group-env/bin/activate`
 
 ## Save and Load Dependencies with `requirements.txt`
 
