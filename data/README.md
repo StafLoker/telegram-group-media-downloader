@@ -23,7 +23,6 @@
 {
     "configs": [
         {
-            "id": 1,
             "description": "Family",
             "config": {
                 "groupName": "Family",
@@ -31,7 +30,6 @@
             }
         },
         {
-            "id": 2,
             "description": "Work",
             "config": {
                 "groupName": "work",
