@@ -12,9 +12,10 @@
 # Byte-compiled / optimized / DLL files
 __pycache__
 
-
 # Other
 *.session
+*.log
+
 
 #########
 # MacOS #

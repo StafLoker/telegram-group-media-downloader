@@ -1,5 +1,6 @@
 import os
-import asyncio
+import logging
+from datetime import datetime, timedelta
 from telethon.sync import TelegramClient
 from telethon.tl.types import DocumentAttributeVideo
 from dotenv import load_dotenv
@@ -13,25 +14,23 @@ api_hash = os.getenv('API_HASH')
 client = TelegramClient('group_media_downloader', api_id, api_hash)
 
 
-# Function to download media
 async def download_media(message, save_path):
     try:
-        if message.media is not None:
-            # Check for image, video, or GIF
-            if hasattr(message.media, 'photo') or (
-                    hasattr(message.media, 'document') and isinstance(message.media.document.attributes[0], DocumentAttributeVideo)
-            ) or (
-                    hasattr(message.media, 'document') and message.media.document.mime_type.split("/")[0] == 'image'
-                    and message.media.document.mime_type.split("/")[1] == 'gif'
-            ):
+        if message.media:
+            if hasattr(message.media, 'photo'):  # Check for photos
                 file = await client.download_media(message.media, file=save_path)
                 return 1
+            elif hasattr(message.media, 'document'):  # Check for documents
+                mime_type = message.media.document.mime_type
+                if mime_type.startswith('image/') or mime_type == 'video/mp4':  # Images or MP4 videos
+                    file = await client.download_media(message.media, file=save_path)
+                    return 1
     except Exception as e:
-        print(f"Error downloading media: {e}")
+        print(f"Error downloading media from message ID {message.id}: {e}")
+        logging.debug(f"Error downloading media from message ID {message.id}: {e}")
     return 0
 
 
-# Main function to download all media files
 async def download_all_media(group_name, start_date_obj, end_date_obj, base_path):
     try:
         await client.start()
@@ -41,7 +40,7 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
 
         # Create base directory
         today = datetime.now().strftime('%d-%m-%Y')
-        folder_name = f"download-group-{group_name}-{today}-s-{start_date}-e-{end_date}"
+        folder_name = f"download-group-{group_name}-{today}-s-{start_date_obj.strftime('%d-%m-%Y')}-e-{end_date_obj.strftime('%d-%m-%Y')}"
         base_dir = os.path.join(base_path, folder_name)
         os.makedirs(base_dir, exist_ok=True)
 
@@ -54,17 +53,25 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
             day_folder = os.path.join(base_dir, date_str)
             os.makedirs(day_folder, exist_ok=True)
 
+            logging.debug(f"Downloading media for {date_str}...")
+            day_count = 0
+
             # Iterate over messages for the specific date
             async for message in client.iter_messages(entity, offset_date=current_date + timedelta(days=1), reverse=True):
                 if message.date.date() == current_date.date():
-                    total_downloaded += await download_media(message, save_path=day_folder)
+                    day_count += await download_media(message, save_path=day_folder)
 
+            logging.debug(f"Downloaded {day_count} files for {date_str}.")
+            total_downloaded += day_count
             current_date += timedelta(days=1)
 
-        print(f"Total images downloaded: {total_downloaded}")
+        print(f"Total media files downloaded: {total_downloaded}")
+        logging.info(f"Total media files downloaded: {total_downloaded}")
 
     except Exception as e:
         print(f"Error: {e}")
+        logging.error(f"Error: {e}")
 
     finally:
         await client.disconnect()
+        
