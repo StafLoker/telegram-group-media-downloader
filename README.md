@@ -1,20 +1,26 @@
-# Telegram Download Media
-Small Python project to download all media from a telegram chat ou group.
+# Telegram Download Media Group
 
-## Info
+This Python script downloads media files (images, videos, and GIFs) from a specific Telegram group or channel for a specified date range and organizes the files into directories by date.
 
-- The project can be run locally.
+## Features
 
-- The project uses 'asyncio' and 'telethon', so you can create a virtual environment if you wish (a .venv) or install globally (not advised)
+- Downloads media files from a Telegram group or channel.
+- Organizes files into folders by date.
+- User input for group name, date range, and save location.
+- Creates a structured directory for downloaded files.
 
-- The project will save files in it's own directory.
+## Requirements
 
-## Instalation
+Install the following Python packages:
 
-Just run the 'index.py'
+- `telethon`
+- `asyncio`
+
+So you can create a virtual environment if you wish (a .venv) or install globally (not advised)
 
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
-[![AGPL License](https://img.shields.io/badge/license-AGPL-blue.svg)](http://www.gnu.org/licenses/agpl-3.0)
+Install them with pip:
 
+```bash
+pip install telethon python-dotenv
+```
