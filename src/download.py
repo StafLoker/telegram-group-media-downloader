@@ -13,6 +13,21 @@ api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
 client = TelegramClient('group_media_downloader', api_id, api_hash)
 
+async def get_group_entity(group_name):
+    """
+    Get the Telegram group entity using the group's name or ID.
+    If it fails to find the group directly, it will search through the user's dialogs.
+    """
+    try:
+        # Try to get the group entity directly
+        return await client.get_entity(group_name)
+    except ValueError:
+        logging.warning(f"Group '{group_name}' not found directly. Searching through dialogs.")
+        async for dialog in client.iter_dialogs():
+            if dialog.name == group_name:
+                logging.info(f"Found group '{group_name}' in user dialogs.")
+                return dialog.entity
+        raise ValueError(f"Group '{group_name}' not found in dialogs.")
 
 async def download_media(message, save_path):
     try:
@@ -36,7 +51,7 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
         await client.start()
 
         # Get group entity
-        entity = await client.get_entity(group_name)
+        entity = await get_group_entity(group_name)
 
         # Create base directory
         today = datetime.now().strftime('%d-%m-%Y')
