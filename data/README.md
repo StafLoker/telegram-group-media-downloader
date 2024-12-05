@@ -40,3 +40,23 @@
     ]
 }
 ```
+
+# Define Restrictions
+1. Create file `restrictions.json`
+2. Load initial structure
+```json
+{
+    "restrictions": [
+        {
+            ...objects
+        }
+    ]
+}
+```
+
+Example
+```json
+{
+  "restrictions": [{ "notDescriptionMessage": ["word1", "word2"] }]
+}
+```
