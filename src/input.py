@@ -2,7 +2,7 @@ import logging
 import json
 import os
 from datetime import datetime, timedelta
-from validation import *
+from input_validation import *
 
 # Path to the config file
 CONFIG_FILE_PATH = 'data/configs.json'
@@ -36,16 +36,16 @@ def update_parameters(choice, group_name, start_date_obj, end_date_obj, save_pat
     """
     match choice:
         case 1:
-            group_name = validate_group_name()
+            group_name = input_validate_group_name()
         case 2:
-            start_date_obj = validate_date("Enter the start date (dd-mm-yyyy): ")
+            start_date_obj = input_validate_date("Enter the start date (dd-mm-yyyy): ")
         case 3:
-            end_date_obj = validate_date("Enter the end date (dd-mm-yyyy): ")
+            end_date_obj = input_validate_date("Enter the end date (dd-mm-yyyy): ")
             while end_date_obj < start_date_obj:
                 print("- Error: End date must be after or equal to the start date.")
-                end_date_obj = validate_date("Enter the end date (dd-mm-yyyy): ")
+                end_date_obj = input_validate_date("Enter the end date (dd-mm-yyyy): ")
         case 4:
-            save_path = validate_save_path()
+            save_path = input_validate_save_path()
             
     return group_name, start_date_obj, end_date_obj, save_path
 
@@ -78,15 +78,15 @@ def manual_input():
     """
     Prompt the user for input manually.
     """
-    group_name = validate_group_name()
-    start_date_obj = validate_date("Enter the start date (dd-mm-yyyy): ")
-    end_date_obj = validate_date("Enter the end date (dd-mm-yyyy): ")
+    group_name = input_validate_group_name()
+    start_date_obj = input_validate_date("Enter the start date (dd-mm-yyyy): ")
+    end_date_obj = input_validate_date("Enter the end date (dd-mm-yyyy): ")
 
     while end_date_obj < start_date_obj:
         print("- Error: End date must be after or equal to the start date.")
-        end_date_obj = validate_date("Enter the end date (dd-mm-yyyy): ")
+        end_date_obj = input_validate_date("Enter the end date (dd-mm-yyyy): ")
 
-    save_path = validate_save_path()
+    save_path = input_validate_save_path()
 
     group_name, start_date_obj, end_date_obj, save_path = while_input(group_name, start_date_obj, end_date_obj, save_path)
 
@@ -120,14 +120,14 @@ def load_config_input():
 
         # Extract config parameters or ask the user if missing
         group_name = config.get("groupName") or validate_group_name()
-        start_date_obj = datetime.strptime(config.get("startDate"), '%d-%m-%Y') if config.get("startDate") is not None else validate_date("Enter the start date (dd-mm-yyyy): ")
-        end_date_obj = datetime.strptime(config.get("endDate"), '%d-%m-%Y') if config.get("endDate")is not None else validate_date("Enter the end date (dd-mm-yyyy): ")
+        start_date_obj = datetime.strptime(config.get("startDate"), '%d-%m-%Y') if config.get("startDate") is not None else input_validate_date("Enter the start date (dd-mm-yyyy): ")
+        end_date_obj = datetime.strptime(config.get("endDate"), '%d-%m-%Y') if config.get("endDate")is not None else input_validate_date("Enter the end date (dd-mm-yyyy): ")
 
         while end_date_obj < start_date_obj:
             print("- Error: End date must be after or equal to the start date.")
-            end_date_obj = validate_date("Enter the end date (dd-mm-yyyy): ")
+            end_date_obj = input_validate_date("Enter the end date (dd-mm-yyyy): ")
 
-        save_path = config.get("savePath") or validate_save_path()
+        save_path = config.get("savePath") or input_validate_save_path()
 
         group_name, start_date_obj, end_date_obj, save_path = while_input(group_name, start_date_obj, end_date_obj, save_path)
 

@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-def validate_group_name():
+def input_validate_group_name():
     """
     Prompt the user for a group name and validate that it's not empty.
     """
@@ -12,7 +12,7 @@ def validate_group_name():
         print("- Error: Group name cannot be empty.")
 
 
-def validate_date(prompt):
+def input_validate_date(prompt):
     """
     Prompt the user for a date and validate the format is 'dd-mm-yyyy'.
     """
@@ -24,7 +24,7 @@ def validate_date(prompt):
             print("- Error: Invalid date format. Please use 'dd-mm-yyyy'.")
 
 
-def validate_save_path():
+def input_validate_save_path():
     """
     Prompt the user for a directory path and validate it exists.
     """
