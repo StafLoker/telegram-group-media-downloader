@@ -1,6 +1,6 @@
 # Telegram Group Media Downloader
 
-This Python script downloads media files (images, videos, and GIFs) from a specific Telegram group or channel for a specified date range and organizes the files into directories by date.
+This Python script downloads media files (images) from a specific Telegram group or channel for a specified date range and organizes the files into directories by date.
 
 ## Features
 
