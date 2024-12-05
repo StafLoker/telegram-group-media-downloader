@@ -2,7 +2,6 @@ import os
 import logging
 from datetime import datetime, timedelta
 from telethon.sync import TelegramClient
-from telethon.tl.types import DocumentAttributeVideo
 from dotenv import load_dotenv
 
 # Load environment variables
