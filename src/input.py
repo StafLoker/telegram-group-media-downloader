@@ -141,7 +141,7 @@ def load_config_input():
     id_obj = 1
     configs = load_configs_file('data/configs.json')
 
-    if not configs:
+    if configs:
         print("- Error: No configurations available.")
         return None
 
@@ -153,7 +153,7 @@ def load_config_input():
     try:
         while True:
             id_obj = int(input("Enter the config ID: ").strip())
-            if id_obj >= 1 and id_obj <= len(configs):
+            if 1 <= id_obj <= len(configs):
                 break
 
         selected_config = configs[id_obj-1]
