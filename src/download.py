@@ -19,6 +19,9 @@ client = TelegramClient('group_media_downloader', api_id, api_hash)
 
 
 async def download_media(message, save_path):
+    """
+    Download media in message
+    """
     logging.debug("Trying download message: %d, Save path: %s",
                   message.id, save_path)
     try:
@@ -38,6 +41,8 @@ async def download_media_general(entity, current_date, next_date, day_folder):
     Iterate over messages for the specific date
     General download
     """
+    day_count = 0
+
     async for message in client.iter_messages(entity, offset_date=current_date, reverse=True):
         if message.date.replace(tzinfo=None) < next_date:
             day_count += await download_media(message, save_path=day_folder)
@@ -54,6 +59,7 @@ async def download_media_specific_group_theme(entity, current_date, date_str, ne
     """
     photo_group = []
     description_message = None
+    day_count = 0
 
     async for message in client.iter_messages(entity, offset_date=current_date, reverse=True):
         if message.date.replace(tzinfo=None) < next_date:
@@ -83,6 +89,9 @@ async def download_media_specific_group_theme(entity, current_date, date_str, ne
 
 
 async def download_all_media(group_name, start_date_obj, end_date_obj, base_path):
+    """
+    Download all media in group name in period [start_date, end_date]
+    """
     try:
         await client.start()
 
