@@ -7,19 +7,18 @@ On Linux:
 
 ## Create Virtual Environment
 
-`python3 -m venv telegram-download-media-group-env`
+`python3 -m venv .venv/telegram-group-media-downloader-env`
 
 ## Activate the Virtual Environment
-- Assuming you are already in the project root
-`source .venv/telegram-download-media-group-env/bin/activate`
+`source .venv/telegram-group-media-downloader-env/bin/activate`
 
 ## Save and Load Dependencies with `requirements.txt`
 
 ### Save
-`pip freeze > requirements.txt`
+`pip freeze > .venv/requirements.txt`
 
 ### Load
-`pip install -r requirements.txt`
+`pip install -r .venv/requirements.txt`
 
 ## Deactivate the Virtual Environment
 
@@ -27,4 +26,4 @@ On Linux:
 
 ## Delete a Virtual Environment
 
-`rm -rf telegram-download-media-group-env`
+`rm -rf .venv/telegram-group-media-downloader-env`

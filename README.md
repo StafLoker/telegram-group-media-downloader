@@ -15,7 +15,6 @@ This Python script downloads media files (images, videos, and GIFs) from a speci
 ### Install the following Python packages:
 
 - `telethon`
-- `asyncio`
 - `dotenv`
 
 So you can create a virtual environment if you wish (a .venv) or install globally (not advised)

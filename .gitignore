@@ -5,6 +5,7 @@
 # Virtual environment
 .venv/*
 !.venv/README.md
+!.venv/requirements.txt
 
 # Environments
 .env
