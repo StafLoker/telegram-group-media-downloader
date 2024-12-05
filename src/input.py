@@ -2,23 +2,40 @@ import logging
 import json
 import os
 from datetime import datetime
-from input_validation import input_validate_group_name, input_validate_date, input_validate_save_path
+from load_files import load_configs_file
 
-# Path to the config file
-CONFIG_FILE_PATH = 'data/configs.json'
+def input_validate_group_name():
+    """
+    Prompt the user for a group name and validate that it's not empty.
+    """
+    while True:
+        group_name = input("Enter the group name: ").strip()
+        if group_name:
+            return group_name
+        print("- Error: Group name cannot be empty.")
 
-def load_configs_file():
+
+def input_validate_date(prompt):
     """
-    Load configurations from the JSON file.
+    Prompt the user for a date and validate the format is 'dd-mm-yyyy'.
     """
-    if not os.path.exists(CONFIG_FILE_PATH):
-        print(f"- Error: Configuration file not found at {CONFIG_FILE_PATH}")
-        logging.error(f"- Error: Configuration file not found at {CONFIG_FILE_PATH}");
-        return []
-    
-    with open(CONFIG_FILE_PATH, 'r') as file:
-        data = json.load(file)
-    return data.get("configs", [])
+    while True:
+        date_input = input(prompt).strip()
+        try:
+            return datetime.strptime(date_input, '%d-%m-%Y')
+        except ValueError:
+            print("- Error: Invalid date format. Please use 'dd-mm-yyyy'.")
+
+
+def input_validate_save_path():
+    """
+    Prompt the user for a directory path and validate it exists.
+    """
+    while True:
+        save_path = input("Enter the directory path where files should be saved: ").strip()
+        if os.path.isdir(save_path):
+            return save_path
+        print("- Error: Invalid path. Please ensure the directory exists.")
 
 def display_results(group_name, start_date, end_date, save_path):
     """
@@ -96,7 +113,7 @@ def load_config_input():
     """
     Prompt the user to choose a config from the file.
     """
-    configs = load_configs_file()
+    configs = load_configs_file('data/configs.json')
     id = 1
 
     if not configs:
