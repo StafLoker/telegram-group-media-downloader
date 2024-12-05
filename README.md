@@ -15,12 +15,21 @@ Install the following Python packages:
 
 - `telethon`
 - `asyncio`
+- `dotenv`
 
 So you can create a virtual environment if you wish (a .venv) or install globally (not advised)
-
 
 Install them with pip:
 
 ```bash
 pip install telethon python-dotenv
 ```
+## Run
+
+```bash
+python src/main.py
+```
+
+# References
+
+- [GitHub: telegram-download-media](https://github.com/marcelohcortez/telegram-download-media)
