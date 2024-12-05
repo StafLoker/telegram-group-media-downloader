@@ -3,6 +3,7 @@ Module providing a function of download content from telegram with `telethon`
 """
 
 import os
+import re
 import logging
 from datetime import datetime, timedelta
 from telethon.sync import TelegramClient
@@ -17,8 +18,14 @@ api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
 client = TelegramClient('group_media_downloader', api_id, api_hash)
 
+def __sanitize_folder_name(folder_name):
+    """
+    Replace characters not allowed in file/folder names with safe equivalents.
+    """
+    sanitized_name = re.sub(r'[<>:"/\\|?*]', '_', folder_name)
+    return sanitized_name.strip()
 
-async def download_media(message, save_path):
+async def __download_media(message, save_path):
     """
     Download media in message
     """
@@ -36,7 +43,7 @@ async def download_media(message, save_path):
     return 0
 
 
-async def download_media_general(entity, current_date, next_date, day_folder):
+async def __download_media_general(entity, current_date, next_date, day_folder):
     """
     Iterate over messages for the specific date
     General download
@@ -45,14 +52,14 @@ async def download_media_general(entity, current_date, next_date, day_folder):
 
     async for message in client.iter_messages(entity, offset_date=current_date, reverse=True):
         if message.date.replace(tzinfo=None) < next_date:
-            day_count += await download_media(message, save_path=day_folder)
+            day_count += await __download_media(message, save_path=day_folder)
         else:
             break
 
     return day_count
 
 
-async def download_media_specific_group_theme(entity, current_date, date_str, next_date, day_folder):
+async def __download_media_specific_group_theme(entity, current_date, date_str, next_date, day_folder):
     """
     Iterate over messages for the specific date
     Specific download - group by theme
@@ -75,7 +82,7 @@ async def download_media_specific_group_theme(entity, current_date, date_str, ne
 
             if description_message and photo_group:
                 logging.debug("Created group: %s", description_message)
-                group_folder_name = f"{date_str} {description_message.text}"
+                group_folder_name = f"{date_str} {__sanitize_folder_name(description_message.text)}"
                 group_folder_path = os.path.join(day_folder, group_folder_name)
                 os.makedirs(group_folder_path, exist_ok=True)
                 logging.debug("--- Group dir. %s created in %s: %s",
@@ -83,7 +90,7 @@ async def download_media_specific_group_theme(entity, current_date, date_str, ne
                 
                 logging.debug("--- Download photos of group: %s", description_message)
                 for photo_message in photo_group:
-                    day_count += await download_media(photo_message, save_path=group_folder_path)
+                    day_count += await __download_media(photo_message, save_path=group_folder_path)
                 logging.debug("--- End of group: %s", description_message)
                 
                 logging.debug("Create new empty group")
@@ -131,9 +138,9 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
 
             match choose:
                 case 1:
-                    day_count = await download_media_general(entity, current_date, (current_date + timedelta(days=1)), day_folder)
+                    day_count = await __download_media_general(entity, current_date, (current_date + timedelta(days=1)), day_folder)
                 case 2:
-                    day_count = await download_media_specific_group_theme(entity, current_date, date_str, (current_date + timedelta(days=1)), day_folder)
+                    day_count = await __download_media_specific_group_theme(entity, current_date, date_str, (current_date + timedelta(days=1)), day_folder)
 
             logging.info("--- Downloaded %d files for %s.",
                          day_count, date_str)
