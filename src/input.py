@@ -1,3 +1,7 @@
+"""
+Module providing a function of input
+"""
+
 import os
 from datetime import datetime
 from load_files import load_configs_file
@@ -134,8 +138,8 @@ def load_config_input():
     """
     Prompt the user to choose a config from the file.
     """
+    id_obj = 1
     configs = load_configs_file('data/configs.json')
-    id = 1
 
     if not configs:
         print("- Error: No configurations available.")
@@ -144,15 +148,15 @@ def load_config_input():
     print("Choose a configuration:")
     for config in configs:
         print(f"{id}. {config['description']}")
-        id+=1
+        id_obj+=1
 
     try:
         while True:
-            id = int(input("Enter the config ID: ").strip())
-            if id >= 1 and id <= len(configs):
+            id_obj = int(input("Enter the config ID: ").strip())
+            if id_obj >= 1 and id_obj <= len(configs):
                 break
 
-        selected_config = configs[id-1]
+        selected_config = configs[id_obj-1]
         print(f"\nYou selected: {selected_config['description']}")
         config = selected_config['config']
 
