@@ -42,4 +42,8 @@ async def main():
     await download_all_media(group_name, start_date_obj, end_date_obj, save_path)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logging.critical("Program interrupted by user (Ctrl+C). Exiting.")
+        print("\nProgram interrupted by user (Ctrl+C). Exiting.")
