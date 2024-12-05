@@ -125,7 +125,6 @@ async def __download_media_specific_group_theme(entity, current_date, date_str, 
                 logging.debug("Create new empty group")
                 photo_group = []
                 description_message = None
-                invalid_group = False
         else:
             break
 
@@ -163,6 +162,11 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
             if choose == 2:
                 return None
 
+        # Progress bar init
+        total_days = (end_date_obj - start_date_obj).days + 1
+        completed_days = 0
+        print("\nDownloading...", end=" ")
+
         # Loop period
         while current_date <= end_date_obj:
             month_str = current_date.strftime('%m-%Y')
@@ -194,10 +198,15 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
                 os.rmdir(day_folder)
 
             total_downloaded += day_count
-
             current_date += timedelta(days=1)
 
-        print(f"Total media files downloaded: {total_downloaded}")
+            # Progress bar print
+            completed_days += 1
+            progress_percentage = int((completed_days / total_days) * 100)
+            bar = f"[{'#' * (progress_percentage // 2)}{'-' * (50 - (progress_percentage // 2))}] {progress_percentage}%"
+            print(f"\r{"Downloading..." if progress_percentage < 100 else "Downloaded:"} {bar}", end='')
+
+        print(f"\n\nTotal media files downloaded: {total_downloaded}")
         logging.info("Total media files downloaded: %d", total_downloaded)
 
     except Exception as e:
