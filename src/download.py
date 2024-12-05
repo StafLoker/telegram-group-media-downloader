@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from telethon.sync import TelegramClient
 from dotenv import load_dotenv
 from input import choose_download_type
+from load_files import load_json_file
 
 # Load environment variables
 load_dotenv()
@@ -26,6 +27,18 @@ def __sanitize_folder_name(folder_name):
     sanitized_name = re.sub(r'[<>:"/\\|?*]', '_', folder_name)
     return sanitized_name.strip()
 
+
+def __is_description_message(message, restrictions):
+    """
+    Checks if a message is not considered a description based on the restrictions.
+    """
+    if not message.message:
+        return False
+
+    for prohibit in restrictions[0]:
+        if prohibit in message.message:
+            return False
+    return True
 
 async def __download_media(message, save_path):
     """
@@ -60,39 +73,44 @@ async def __download_media_general(entity, current_date, next_date, day_folder):
 
     return day_count
 
-# @TODO Por ejemplo para descarga `download-group-Текущие работы УК-05-12-2024-s-01-07-2024-e-11-07-2024`
-# entonces hay caso que hay videos y despues una descripcion en realida eso no hay que descargar y crear carpeta.
-# Pero como se ve hay que sigiente es foto y ya tiene description lo descarga y esta mal.
-# A parte salto (posible puede implicar mal descarga) todos las obras que estan en correcto formato pero en vez de
-# tener un nuevo mensaje con descrition tienen un mensaje con fotos y anadida descropcion al fotos
-
-
-async def __download_media_specific_group_theme(entity, current_date, date_str, next_date, day_folder):
+async def __download_media_specific_group_theme(entity, current_date, date_str, next_date, day_folder, restrictions):
     """
     Iterate over messages for the specific date
     Specific download - group by theme
-    Message timeline - group = {[fotos] [description]}
+    Message timeline - group = {[photos] [description]}
     """
     day_count = 0
 
     logging.debug("Create new empty group")
     photo_group = []
-    description_message = None
+    description_message : str = None
 
     async for message in client.iter_messages(entity, offset_date=current_date, reverse=True):
+        # Process messages only current date
         if message.date.replace(tzinfo=None) < next_date:
+            logging.debug("Message: id: %s, date: %s, message: %s, media: %s", message.id, message.date, message.message, message.media)
+            # Filter messages
             if message.media and hasattr(message.media, 'photo'):
-                photo_group.append(message)
-                logging.debug("--- Add photo to group: %d", message.id)
-            elif message.text and not message.media:
-                description_message = message
+                if not message.message:
+                    photo_group.append(message)
+                    logging.debug("--- Add photo to group: %d", message.id)
+                else:
+                    if __is_description_message(message, restrictions):
+                        photo_group.append(message)
+                        logging.debug("--- Add photo to group: %d", message.id)
+                        description_message = message.message
+                        logging.debug(
+                            "--- Found description message of group: %d", message.id)
+            elif __is_description_message(message, restrictions) and photo_group:
+                description_message = message.message
                 logging.debug(
                     "--- Found description message of group: %d", message.id)
 
-            if description_message and photo_group:
+            # Valid group
+            if description_message is not None and photo_group:
                 logging.debug("Created group: %s", description_message)
                 group_folder_name = f"{date_str} {
-                    __sanitize_folder_name(description_message.text)}"
+                    __sanitize_folder_name(description_message)}"
                 group_folder_path = os.path.join(day_folder, group_folder_name)
                 os.makedirs(group_folder_path, exist_ok=True)
                 logging.debug("--- Group dir. %s created in %s: %s",
@@ -107,10 +125,12 @@ async def __download_media_specific_group_theme(entity, current_date, date_str, 
                 logging.debug("Create new empty group")
                 photo_group = []
                 description_message = None
+                invalid_group = False
         else:
             break
 
     return day_count
+
 
 async def download_all_media(group_name, start_date_obj, end_date_obj, base_path):
     """
@@ -131,9 +151,17 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
         logging.debug("Base dir. %s created in %s: %s",
                       name_dir, base_path, base_dir)
 
+        # Choose type
         choose = choose_download_type()
         total_downloaded = 0
         current_date = start_date_obj
+
+        # Load restrictions
+        restrictions = load_json_file("data/restrictions.json", "restrictions")
+        if restrictions is None:
+            print("- Error: No restrictions available.")
+            if choose == 2:
+                return None
 
         # Loop period
         while current_date <= end_date_obj:
@@ -145,10 +173,10 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
                               month_str, base_dir, month_folder)
 
             date_str = current_date.strftime('%d-%m-%Y')
-            day_folder = os.path.join(month_str, date_str)
+            day_folder = os.path.join(month_folder, date_str)
             os.makedirs(day_folder, exist_ok=True)
             logging.debug("Day dir. %s created in %s: %s",
-                          date_str, month_str, day_folder)
+                          date_str, month_folder, day_folder)
 
             logging.info("Downloading media for day: %s", date_str)
 
@@ -156,7 +184,7 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
                 case 1:
                     day_count = await __download_media_general(entity, current_date, (current_date + timedelta(days=1)), day_folder)
                 case 2:
-                    day_count = await __download_media_specific_group_theme(entity, current_date, date_str, (current_date + timedelta(days=1)), day_folder)
+                    day_count = await __download_media_specific_group_theme(entity, current_date, date_str, (current_date + timedelta(days=1)), day_folder, restrictions)
 
             logging.info("--- Downloaded %d files for %s.",
                          day_count, date_str)
@@ -164,8 +192,8 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
                 logging.info(
                     "No files downloaded for %s. Removing folder %s.", date_str, day_folder)
                 os.rmdir(day_folder)
-            else:
-                total_downloaded += day_count
+
+            total_downloaded += day_count
 
             current_date += timedelta(days=1)
 
