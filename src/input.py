@@ -111,7 +111,7 @@ def choose_download_type():
     """
     Prompt the user for input choose download type.
     """
-    print("Choose download type an option:")
+    print("\nChoose download type an option:")
     print("1. General")
     print("2. Specific - group by theme")
 
@@ -123,7 +123,7 @@ def choose_download_type():
             else:
                 print("- Error: Invalid option.")
         except ValueError:
-            print("- Error: Please enter a valid number.\n")
+            print("- Error: Please enter a valid number.")
     return choice
 
 
@@ -160,7 +160,7 @@ def load_config_input():
         print("- Error: No configurations available.")
         return None
 
-    print("Choose a configuration:")
+    print("\nChoose a configuration:")
     for config in configs:
         print(f"{id_obj}. {config['description']}")
         id_obj += 1
