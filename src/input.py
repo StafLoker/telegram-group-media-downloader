@@ -141,7 +141,7 @@ def load_config_input():
     id_obj = 1
     configs = load_configs_file('data/configs.json')
 
-    if configs:
+    if configs is None:
         print("- Error: No configurations available.")
         return None
 
