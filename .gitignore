@@ -14,7 +14,7 @@
 __pycache__
 
 # Other
-*.session
+*.session*
 *.log
 data/*
 !data/README.md
