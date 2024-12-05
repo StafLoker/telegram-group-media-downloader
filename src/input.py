@@ -4,7 +4,7 @@ Module providing a function of input
 
 import os
 from datetime import datetime
-from load_files import load_configs_file
+from load_files import load_json_file
 
 
 def __display_results(group_name, start_date, end_date, save_path):
@@ -154,7 +154,7 @@ def load_config_input():
     Prompt the user to choose a config from the file.
     """
     id_obj = 1
-    configs = load_configs_file('data/configs.json')
+    configs = load_json_file("data/configs.json", "configs")
 
     if configs is None:
         print("- Error: No configurations available.")
@@ -172,7 +172,7 @@ def load_config_input():
                 break
         except ValueError:
             print("- Error: Invalid input.")
-    
+
     selected_config = configs[id_obj-1]
     print(f"\nYou selected: {selected_config['description']}")
     config = selected_config['config']
@@ -192,6 +192,6 @@ def load_config_input():
     save_path = config.get("savePath") or __input_validate_save_path()
 
     group_name, start_date_obj, end_date_obj, save_path = __while_input(
-         group_name, start_date_obj, end_date_obj, save_path)
+        group_name, start_date_obj, end_date_obj, save_path)
 
     return group_name, start_date_obj, end_date_obj, save_path
