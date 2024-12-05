@@ -16,7 +16,11 @@ logging.basicConfig(
     ]
 )
 
+
 async def main():
+    """
+    main function
+    """
     while True:
         print("Choose an option:")
         print("1. Load configuration from file")
