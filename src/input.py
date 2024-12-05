@@ -147,7 +147,7 @@ def load_config_input():
 
     print("Choose a configuration:")
     for config in configs:
-        print(f"{id}. {config['description']}")
+        print(f"{id_obj}. {config['description']}")
         id_obj+=1
 
     try:
