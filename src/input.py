@@ -1,8 +1,8 @@
 import logging
 import json
 import os
-from datetime import datetime, timedelta
-from input_validation import *
+from datetime import datetime
+from input_validation import input_validate_group_name, input_validate_date, input_validate_save_path
 
 # Path to the config file
 CONFIG_FILE_PATH = 'data/configs.json'
@@ -119,7 +119,7 @@ def load_config_input():
         config = selected_config['config']
 
         # Extract config parameters or ask the user if missing
-        group_name = config.get("groupName") or validate_group_name()
+        group_name = config.get("groupName") or input_validate_group_name()
         start_date_obj = datetime.strptime(config.get("startDate"), '%d-%m-%Y') if config.get("startDate") is not None else input_validate_date("Enter the start date (dd-mm-yyyy): ")
         end_date_obj = datetime.strptime(config.get("endDate"), '%d-%m-%Y') if config.get("endDate")is not None else input_validate_date("Enter the end date (dd-mm-yyyy): ")
 
