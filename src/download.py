@@ -1,5 +1,5 @@
 """
-Module providing a function of download contenten from telegram with `telethon`
+Module providing a function of download content from telegram with `telethon`
 """
 
 import os
@@ -57,31 +57,38 @@ async def download_media_specific_group_theme(entity, current_date, date_str, ne
     Iterate over messages for the specific date
     Specific download - group by theme
     """
+    day_count = 0
+
+    logging.debug("Create new empty group")
     photo_group = []
     description_message = None
-    day_count = 0
 
     async for message in client.iter_messages(entity, offset_date=current_date, reverse=True):
         if message.date.replace(tzinfo=None) < next_date:
             if message.media and hasattr(message.media, 'photo'):
                 photo_group.append(message)
-                logging.debug("Agregado a grupo de fotos: %d", message.id)
+                logging.debug("--- Add photo to group: %d", message.id)
             elif message.text and not message.media:
                 description_message = message
                 logging.debug(
-                    "Mensaje de descripción encontrado: %d", message.id)
+                    "--- Found description message of group: %d", message.id)
 
             if description_message and photo_group:
+                logging.debug("Created group: %s", description_message)
                 group_folder_name = f"{date_str} {description_message.text}"
                 group_folder_path = os.path.join(day_folder, group_folder_name)
                 os.makedirs(group_folder_path, exist_ok=True)
-                logging.debug("Dir. %s created in %s: %s",
+                logging.debug("--- Group dir. %s created in %s: %s",
                               group_folder_name, day_folder, group_folder_path)
-
+                
+                logging.debug("--- Download photos of group: %s", description_message)
                 for photo_message in photo_group:
                     day_count += await download_media(photo_message, save_path=group_folder_path)
-                    photo_group = []
-                    description_message = None
+                logging.debug("--- End of group: %s", description_message)
+                
+                logging.debug("Create new empty group")
+                photo_group = []
+                description_message = None
         else:
             break
 
@@ -104,35 +111,39 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
             start_date_obj.strftime('%d-%m-%Y')}-e-{end_date_obj.strftime('%d-%m-%Y')}"
         base_dir = os.path.join(base_path, name_dir)
         os.makedirs(base_dir, exist_ok=True)
-        logging.debug("Dir. %s created in %s: %s",
+        logging.debug("Base dir. %s created in %s: %s",
                       name_dir, base_path, base_dir)
 
-        choose = choose_download_type()
 
+        choose = choose_download_type()
         total_downloaded = 0
-        # Loop over dates
         current_date = start_date_obj
-        next_date = current_date + timedelta(days=1)
+
+        # Loop period
         while current_date <= end_date_obj:
             date_str = current_date.strftime('%d-%m-%Y')
             day_folder = os.path.join(base_dir, date_str)
             os.makedirs(day_folder, exist_ok=True)
-            logging.debug("Dir. %s created in %s: %s",
+            logging.debug("Day dir. %s created in %s: %s",
                           date_str, base_dir, day_folder)
 
-            logging.info("Downloading media for %s", date_str)
+            logging.info("Downloading media for day: %s", date_str)
 
             match choose:
                 case 1:
-                    day_count = await download_media_general(entity, current_date, next_date, day_folder)
+                    day_count = await download_media_general(entity, current_date, (current_date + timedelta(days=1)), day_folder)
                 case 2:
-                    day_count = await download_media_specific_group_theme(entity, current_date, date_str, next_date, day_folder)
+                    day_count = await download_media_specific_group_theme(entity, current_date, date_str, (current_date + timedelta(days=1)), day_folder)
 
             logging.info("--- Downloaded %d files for %s.",
                          day_count, date_str)
-            total_downloaded += day_count
+            if day_count == 0:
+                logging.info("No files downloaded for %s. Removing folder %s.", date_str, day_folder)
+                os.rmdir(day_folder)
+            else:
+                total_downloaded += day_count
+
             current_date += timedelta(days=1)
-            next_date += timedelta(days=1)
 
         print(f"Total media files downloaded: {total_downloaded}")
         logging.info("Total media files downloaded: %d", total_downloaded)
