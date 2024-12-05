@@ -37,11 +37,12 @@ async def main():
             else:
                 print("- Error: Invalid option.")
         except ValueError:
-            print("- Error: Please enter a valid number.\n")
+            print("- Error: Please enter a valid number.")
 
     await download_all_media(group_name, start_date_obj, end_date_obj, save_path)
 
 if __name__ == "__main__":
+    logging.info("Running Telegram Group Media Downloader")
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
