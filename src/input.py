@@ -120,8 +120,8 @@ def load_config_input():
 
         # Extract config parameters or ask the user if missing
         group_name = config.get("groupName") or validate_group_name()
-        start_date_obj = datetime.strptime(config.get("startDate"), '%d-%m-%Y') or validate_date("Enter the start date (dd-mm-yyyy): ")
-        end_date_obj = datetime.strptime(config.get("endDate"), '%d-%m-%Y') or validate_date("Enter the end date (dd-mm-yyyy): ")
+        start_date_obj = datetime.strptime(config.get("startDate"), '%d-%m-%Y') if config.get("startDate") is not None else validate_date("Enter the start date (dd-mm-yyyy): ")
+        end_date_obj = datetime.strptime(config.get("endDate"), '%d-%m-%Y') if config.get("endDate")is not None else validate_date("Enter the end date (dd-mm-yyyy): ")
 
         while end_date_obj < start_date_obj:
             print("- Error: End date must be after or equal to the start date.")
