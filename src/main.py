@@ -1,3 +1,7 @@
+"""
+Main
+"""
+
 import logging
 import asyncio
 from input import load_config_input, manual_input
