@@ -32,10 +32,12 @@ def __is_description_message(message, restrictions):
     """
     Checks if a message is not considered a description based on the restrictions.
     """
+    # Have text
     if not message.message:
         return False
-
-    for prohibit in restrictions[0]:
+    
+    # Have prohibit text
+    for prohibit in restrictions[0].get('notDescriptionMessage', []):
         if prohibit in message.message:
             return False
     return True
@@ -67,6 +69,7 @@ async def __download_media_general(entity, current_date, next_date, day_folder):
 
     async for message in client.iter_messages(entity, offset_date=current_date, reverse=True):
         if message.date.replace(tzinfo=None) < next_date:
+            logging.debug("Message: id: %s, date: %s, message: %s, media: %s", message.id, message.date, message.message, message.media)
             day_count += await __download_media(message, save_path=day_folder)
         else:
             break
@@ -94,19 +97,17 @@ async def __download_media_specific_group_theme(entity, current_date, date_str, 
                 if not message.message:
                     photo_group.append(message)
                     logging.debug("--- Add photo to group: %d", message.id)
-                else:
-                    if __is_description_message(message, restrictions):
-                        photo_group.append(message)
-                        logging.debug("--- Add photo to group: %d", message.id)
-                        description_message = message.message
-                        logging.debug(
+                elif __is_description_message(message, restrictions):
+                    photo_group.append(message)
+                    logging.debug("--- Add photo to group: %d", message.id)
+                    description_message = message.message
+                    logging.debug(
                             "--- Found description message of group: %d", message.id)
             elif __is_description_message(message, restrictions) and photo_group:
                 description_message = message.message
                 logging.debug(
                     "--- Found description message of group: %d", message.id)
 
-            # Valid group
             if description_message is not None and photo_group:
                 logging.debug("Created group: %s", description_message)
                 group_folder_name = f"{date_str} {
