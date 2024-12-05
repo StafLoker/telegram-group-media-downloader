@@ -1,3 +1,7 @@
+"""
+Main
+"""
+
 import logging
 import asyncio
 from input import load_config_input, manual_input
@@ -12,7 +16,11 @@ logging.basicConfig(
     ]
 )
 
+
 async def main():
+    """
+    main function
+    """
     while True:
         print("Choose an option:")
         print("1. Load configuration from file")
@@ -29,9 +37,14 @@ async def main():
             else:
                 print("- Error: Invalid option.")
         except ValueError:
-            print("- Error: Please enter a valid number.\n")
+            print("- Error: Please enter a valid number.")
 
     await download_all_media(group_name, start_date_obj, end_date_obj, save_path)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    logging.info("Running Telegram Group Media Downloader")
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logging.critical("Program interrupted by user (Ctrl+C). Exiting.")
+        print("\nProgram interrupted by user (Ctrl+C). Exiting.")

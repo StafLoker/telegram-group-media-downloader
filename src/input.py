@@ -1,26 +1,13 @@
-import logging
-import json
+"""
+Module providing a function of input
+"""
+
 import os
 from datetime import datetime
-from input_validation import input_validate_group_name, input_validate_date, input_validate_save_path
+from load_files import load_json_file
 
-# Path to the config file
-CONFIG_FILE_PATH = 'data/configs.json'
 
-def load_configs_file():
-    """
-    Load configurations from the JSON file.
-    """
-    if not os.path.exists(CONFIG_FILE_PATH):
-        print(f"- Error: Configuration file not found at {CONFIG_FILE_PATH}")
-        logging.error(f"- Error: Configuration file not found at {CONFIG_FILE_PATH}");
-        return []
-    
-    with open(CONFIG_FILE_PATH, 'r') as file:
-        data = json.load(file)
-    return data.get("configs", [])
-
-def display_results(group_name, start_date, end_date, save_path):
+def __display_results(group_name, start_date, end_date, save_path):
     """
     Display the current inputs for user confirmation.
     """
@@ -30,28 +17,72 @@ def display_results(group_name, start_date, end_date, save_path):
     print(f"3. End Date: {end_date}")
     print(f"4. Save Path: {save_path}")
 
-def update_parameters(choice, group_name, start_date_obj, end_date_obj, save_path):
+
+def __input_validate_group_name():
+    """
+    Prompt the user for a group name and validate that it's not empty.
+    """
+    while True:
+        group_name = input("Enter the group name: ").strip()
+        if group_name:
+            return group_name
+        print("- Error: Group name cannot be empty.")
+
+
+def __input_validate_date(prompt):
+    """
+    Prompt the user for a date and validate the format is 'dd-mm-yyyy'.
+    """
+    while True:
+        date_input = input(prompt).strip()
+        try:
+            return datetime.strptime(date_input, '%d-%m-%Y')
+        except ValueError:
+            print("- Error: Invalid date format. Please use 'dd-mm-yyyy'.")
+
+
+def __input_validate_save_path():
+    """
+    Prompt the user for a directory path and validate it exists.
+    """
+    while True:
+        save_path = input(
+            "Enter the directory path where files should be saved: ").strip()
+        if os.path.isdir(save_path):
+            return save_path
+        print("- Error: Invalid path. Please ensure the directory exists.")
+
+
+def __update_parameters(choice, group_name, start_date_obj, end_date_obj, save_path):
     """
     Allow the user to update a specific parameter based on their choice.
     """
     match choice:
         case 1:
-            group_name = input_validate_group_name()
+            group_name = __input_validate_group_name()
         case 2:
-            start_date_obj = input_validate_date("Enter the start date (dd-mm-yyyy): ")
+            start_date_obj = __input_validate_date(
+                "Enter the start date (dd-mm-yyyy): ")
         case 3:
-            end_date_obj = input_validate_date("Enter the end date (dd-mm-yyyy): ")
+            end_date_obj = __input_validate_date(
+                "Enter the end date (dd-mm-yyyy): ")
             while end_date_obj < start_date_obj:
                 print("- Error: End date must be after or equal to the start date.")
-                end_date_obj = input_validate_date("Enter the end date (dd-mm-yyyy): ")
+                end_date_obj = __input_validate_date(
+                    "Enter the end date (dd-mm-yyyy): ")
         case 4:
-            save_path = input_validate_save_path()
-            
+            save_path = __input_validate_save_path()
+
     return group_name, start_date_obj, end_date_obj, save_path
 
-def while_input(group_name, start_date_obj, end_date_obj, save_path):
+
+def __while_input(group_name, start_date_obj, end_date_obj, save_path):
+    """
+    Prompt the user for correct information
+    """
     while True:
-        display_results(group_name, start_date_obj.strftime('%d-%m-%Y'), end_date_obj.strftime('%d-%m-%Y'), save_path)
+        __display_results(group_name, start_date_obj.strftime(
+            '%d-%m-%Y'), end_date_obj.strftime('%d-%m-%Y'), save_path)
 
         confirm = input("Is the information correct? (y/n): ").strip().lower()
         if confirm == 'y':
@@ -63,9 +94,10 @@ def while_input(group_name, start_date_obj, end_date_obj, save_path):
             print("3. End Date")
             print("4. Save Path")
             try:
-                choice = int(input("Enter the number of the parameter to change: ").strip())
+                choice = int(
+                    input("Enter the number of the parameter to change: ").strip())
                 if choice in {1, 2, 3, 4}:
-                    group_name, start_date_obj, end_date_obj, save_path = update_parameters(
+                    group_name, start_date_obj, end_date_obj, save_path = __update_parameters(
                         choice, group_name, start_date_obj, end_date_obj, save_path)
                 else:
                     print("- Error: Invalid choice. Please select a valid option.")
@@ -74,64 +106,92 @@ def while_input(group_name, start_date_obj, end_date_obj, save_path):
         else:
             print("- Error: Please enter 'y' or 'n'.")
 
+
+def choose_download_type():
+    """
+    Prompt the user for input choose download type.
+    """
+    print("\nChoose download type an option:")
+    print("1. General")
+    print("2. Specific - group by theme")
+
+    while True:
+        try:
+            choice = int(input("Enter the option number: ").strip())
+            if 1 <= choice <= 2:
+                break
+            else:
+                print("- Error: Invalid option.")
+        except ValueError:
+            print("- Error: Please enter a valid number.")
+    return choice
+
+
 def manual_input():
     """
     Prompt the user for input manually.
     """
-    group_name = input_validate_group_name()
-    start_date_obj = input_validate_date("Enter the start date (dd-mm-yyyy): ")
-    end_date_obj = input_validate_date("Enter the end date (dd-mm-yyyy): ")
+    group_name = __input_validate_group_name()
+    start_date_obj = __input_validate_date(
+        "Enter the start date (dd-mm-yyyy): ")
+    end_date_obj = __input_validate_date("Enter the end date (dd-mm-yyyy): ")
 
     while end_date_obj < start_date_obj:
         print("- Error: End date must be after or equal to the start date.")
-        end_date_obj = input_validate_date("Enter the end date (dd-mm-yyyy): ")
+        end_date_obj = __input_validate_date(
+            "Enter the end date (dd-mm-yyyy): ")
 
-    save_path = input_validate_save_path()
+    save_path = __input_validate_save_path()
 
-    group_name, start_date_obj, end_date_obj, save_path = while_input(group_name, start_date_obj, end_date_obj, save_path)
+    group_name, start_date_obj, end_date_obj, save_path = __while_input(
+        group_name, start_date_obj, end_date_obj, save_path)
 
     return group_name, start_date_obj, end_date_obj, save_path
+
 
 def load_config_input():
     """
     Prompt the user to choose a config from the file.
     """
-    configs = load_configs_file()
-    id = 1
+    id_obj = 1
+    configs = load_json_file("data/configs.json", "configs")
 
-    if not configs:
+    if configs is None:
         print("- Error: No configurations available.")
-        return
+        return None
 
-    print("Choose a configuration:")
+    print("\nChoose a configuration:")
     for config in configs:
-        print(f"{id}. {config['description']}")
-        id+=1
+        print(f"{id_obj}. {config['description']}")
+        id_obj += 1
 
-    try:
-        while True:
-            id = int(input("Enter the config ID: ").strip())
-            if id >= 1 and id <= len(configs):
+    while True:
+        try:
+            id_obj = int(input("Enter the config ID: ").strip())
+            if 1 <= id_obj <= len(configs):
                 break
+        except ValueError:
+            print("- Error: Invalid input.")
 
-        selected_config = configs[id-1]
-        print(f"\nYou selected: {selected_config['description']}")
-        config = selected_config['config']
+    selected_config = configs[id_obj-1]
+    print(f"\nYou selected: {selected_config['description']}")
+    config = selected_config['config']
 
-        # Extract config parameters or ask the user if missing
-        group_name = config.get("groupName") or input_validate_group_name()
-        start_date_obj = datetime.strptime(config.get("startDate"), '%d-%m-%Y') if config.get("startDate") is not None else input_validate_date("Enter the start date (dd-mm-yyyy): ")
-        end_date_obj = datetime.strptime(config.get("endDate"), '%d-%m-%Y') if config.get("endDate")is not None else input_validate_date("Enter the end date (dd-mm-yyyy): ")
+    # Extract config parameters or ask the user if missing
+    group_name = config.get("groupName") or __input_validate_group_name()
+    start_date_obj = datetime.strptime(config.get("startDate"), '%d-%m-%Y') if config.get(
+        "startDate") is not None else __input_validate_date("Enter the start date (dd-mm-yyyy): ")
+    end_date_obj = datetime.strptime(config.get("endDate"), '%d-%m-%Y') if config.get(
+        "endDate") is not None else __input_validate_date("Enter the end date (dd-mm-yyyy): ")
 
-        while end_date_obj < start_date_obj:
-            print("- Error: End date must be after or equal to the start date.")
-            end_date_obj = input_validate_date("Enter the end date (dd-mm-yyyy): ")
+    while end_date_obj < start_date_obj:
+        print("- Error: End date must be after or equal to the start date.")
+        end_date_obj = __input_validate_date(
+            "Enter the end date (dd-mm-yyyy): ")
 
-        save_path = config.get("savePath") or input_validate_save_path()
+    save_path = config.get("savePath") or __input_validate_save_path()
 
-        group_name, start_date_obj, end_date_obj, save_path = while_input(group_name, start_date_obj, end_date_obj, save_path)
+    group_name, start_date_obj, end_date_obj, save_path = __while_input(
+        group_name, start_date_obj, end_date_obj, save_path)
 
-        return group_name, start_date_obj, end_date_obj, save_path
-
-    except ValueError:
-        print("- Error: Invalid input.")
+    return group_name, start_date_obj, end_date_obj, save_path
