@@ -6,7 +6,7 @@ import json
 import os
 import logging
 
-def load_configs_file(path):
+def load_json_file(path, root_element):
     """
     Load configurations from the JSON file.
     """
@@ -17,4 +17,4 @@ def load_configs_file(path):
     
     with open(path, 'r', encoding="utf-8") as file:
         data = json.load(file)
-    return data.get("configs", [])
+    return data.get(root_element, [])
