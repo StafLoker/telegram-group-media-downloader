@@ -8,7 +8,40 @@ This Python script downloads media files (images) from a specific Telegram group
 - Organizes files into folders by date.
 - User input for group name, date range, and save location.
 - Creates a structured directory for downloaded files.
-- Permit to use configs
+- Allows configuration via config files.
+- 2 download modes
+
+## Download Modes
+
+- **General download**: Downloads all media from the group.
+
+Result:
+```
+└── download-group-family-group-05-12-2024-s-01-07-2024-e-30-11-2024/
+    └── 07-2024
+        └── 02-07-2024/
+            └── image1.jpg
+            └── image2.png
+        └── 03-07-2024/
+            └── image3.jpg
+```
+- **Grouped download**: Groups media files into themes (categories) based on content type (`theme = [photo, photo, ...[description]`), allowing better organization.
+
+Result:
+```
+└── download-group-family-group-05-12-2024-s-01-07-2024-e-30-11-2024/
+    └── 07-2024
+        └── 02-07-2024/
+            └── theme1
+                └── image1.jpg
+                └── image2.png
+            └── theme2
+                └── image3.jpg
+                └── image4.png
+        └── 03-07-2024/
+            └── theme3
+                └── image5.jpg
+```
 
 ## Requirements
 
@@ -31,6 +64,11 @@ pip install telethon python-dotenv
 
 Created api_id & api_hash save to `.env` like:
 ```
+## Logs
+# [dev, prod]
+LOGGER_CONFIG = 'prod'
+
+## API
 API_ID = number
 API_HASH = 'text'
 ```
