@@ -14,7 +14,7 @@ import json
 import os
 import logging
 
-def load_json_file(path, root_element):
+def read_json_config(path, root_element):
     """
     Load a specific element from a JSON configuration file.
 

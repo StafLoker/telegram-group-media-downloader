@@ -17,8 +17,8 @@ Functions:
 
 import logging
 import asyncio
-from input import load_config_input, manual_input
-from download import download_all_media
+from input import get_input_from_config, get_manual_input
+from download import download_media_from_group
 
 # Configure logging
 logging.basicConfig(
@@ -55,17 +55,17 @@ async def main():
         try:
             choice = int(input("Enter the option number: ").strip())
             if choice == 1:
-                group_name, start_date_obj, end_date_obj, save_path = load_config_input()
+                group_name, start_date_obj, end_date_obj, save_path = get_input_from_config()
                 break
             elif choice == 2:
-                group_name, start_date_obj, end_date_obj, save_path = manual_input()
+                group_name, start_date_obj, end_date_obj, save_path = get_manual_input()
                 break
             else:
                 print("- Error: Invalid option.")
         except ValueError:
             print("- Error: Please enter a valid number.")
 
-    await download_all_media(group_name, start_date_obj, end_date_obj, save_path)
+    await download_media_from_group(group_name, start_date_obj, end_date_obj, save_path)
 
 if __name__ == "__main__":
     logging.info("Running Telegram Group Media Downloader")

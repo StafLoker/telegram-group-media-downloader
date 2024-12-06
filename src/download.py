@@ -13,8 +13,8 @@ import logging
 from datetime import datetime, timedelta
 from telethon.sync import TelegramClient
 from dotenv import load_dotenv
-from input import choose_download_type
-from load_files import load_json_file
+from input import select_download_mode
+from load_files import read_json_config
 
 # Load environment variables
 load_dotenv()
@@ -25,7 +25,7 @@ api_hash = os.getenv('API_HASH')
 client = TelegramClient('group_media_downloader', api_id, api_hash)
 
 
-def __sanitize_folder_name(folder_name):
+def __clean_folder_name(folder_name):
     """
     Replace invalid characters in folder names with underscores.
 
@@ -39,7 +39,7 @@ def __sanitize_folder_name(folder_name):
     return sanitized_name.strip()
 
 
-def __is_description_message(message, restrictions):
+def __is_valid_description(message, restrictions):
     """
     Determine if a message qualifies as a description based on restrictions.
 
@@ -60,7 +60,7 @@ def __is_description_message(message, restrictions):
             return False
     return True
 
-async def __download_media(message, save_path):
+async def __save_media(message, save_path):
     """
     Download media content from a Telegram message.
 
@@ -85,7 +85,7 @@ async def __download_media(message, save_path):
     return 0
 
 
-async def __download_media_general(entity, current_date, next_date, day_folder):
+async def __process_general_download(entity, current_date, next_date, day_folder):
     """
     Download all media from a Telegram group for a specific date.
 
@@ -103,13 +103,13 @@ async def __download_media_general(entity, current_date, next_date, day_folder):
     async for message in client.iter_messages(entity, offset_date=current_date, reverse=True):
         if message.date.replace(tzinfo=None) < next_date:
             logging.debug("Message: id: %s, date: %s, message: %s, media: %s", message.id, message.date, message.message, message.media)
-            day_count += await __download_media(message, save_path=day_folder)
+            day_count += await __save_media(message, save_path=day_folder)
         else:
             break
 
     return day_count
 
-async def __download_media_specific_group_theme(entity, current_date, date_str, next_date, day_folder, restrictions):
+async def __process_theme_grouped_download(entity, current_date, date_str, next_date, day_folder, restrictions):
     """
     Download media grouped by themes for a specific date.
 
@@ -139,13 +139,13 @@ async def __download_media_specific_group_theme(entity, current_date, date_str, 
                 if not message.message:
                     photo_group.append(message)
                     logging.debug("--- Add photo to group: %d", message.id)
-                elif __is_description_message(message, restrictions):
+                elif __is_valid_description(message, restrictions):
                     photo_group.append(message)
                     logging.debug("--- Add photo to group: %d", message.id)
                     description_message = message.message
                     logging.debug(
                             "--- Found description message of group: %d", message.id)
-            elif __is_description_message(message, restrictions) and photo_group:
+            elif __is_valid_description(message, restrictions) and photo_group:
                 description_message = message.message
                 logging.debug(
                     "--- Found description message of group: %d", message.id)
@@ -153,7 +153,7 @@ async def __download_media_specific_group_theme(entity, current_date, date_str, 
             if description_message is not None and photo_group:
                 logging.debug("Created group: %s", description_message)
                 group_folder_name = f"{date_str} {
-                    __sanitize_folder_name(description_message)}"
+                    __clean_folder_name(description_message)}"
                 group_folder_path = os.path.join(day_folder, group_folder_name)
                 os.makedirs(group_folder_path, exist_ok=True)
                 logging.debug("--- Group dir. %s created in %s: %s",
@@ -162,7 +162,7 @@ async def __download_media_specific_group_theme(entity, current_date, date_str, 
                 logging.debug("--- Download photos of group: %s",
                               description_message)
                 for photo_message in photo_group:
-                    day_count += await __download_media(photo_message, save_path=group_folder_path)
+                    day_count += await __save_media(photo_message, save_path=group_folder_path)
                 logging.debug("--- End of group: %s", description_message)
 
                 logging.debug("Create new empty group")
@@ -174,7 +174,7 @@ async def __download_media_specific_group_theme(entity, current_date, date_str, 
     return day_count
 
 
-async def download_all_media(group_name, start_date_obj, end_date_obj, base_path):
+async def download_media_from_group(group_name, start_date_obj, end_date_obj, base_path):
     """
     Download all media from a Telegram group within a specified date range.
 
@@ -203,12 +203,12 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
                       name_dir, base_path, base_dir)
 
         # Choose type
-        choose = choose_download_type()
+        choose = select_download_mode()
         total_downloaded = 0
         current_date = start_date_obj
 
         # Load restrictions
-        restrictions = load_json_file("data/restrictions.json", "restrictions")
+        restrictions = read_json_config("data/restrictions.json", "restrictions")
         if restrictions is None:
             print("- Error: No restrictions available.")
             if choose == 2:
@@ -238,9 +238,9 @@ async def download_all_media(group_name, start_date_obj, end_date_obj, base_path
 
             match choose:
                 case 1:
-                    day_count = await __download_media_general(entity, current_date, (current_date + timedelta(days=1)), day_folder)
+                    day_count = await __process_general_download(entity, current_date, (current_date + timedelta(days=1)), day_folder)
                 case 2:
-                    day_count = await __download_media_specific_group_theme(entity, current_date, date_str, (current_date + timedelta(days=1)), day_folder, restrictions)
+                    day_count = await __process_theme_grouped_download(entity, current_date, date_str, (current_date + timedelta(days=1)), day_folder, restrictions)
 
             logging.info("--- Downloaded %d files for %s.",
                          day_count, date_str)
