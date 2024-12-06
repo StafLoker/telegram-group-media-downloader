@@ -1,5 +1,13 @@
 """
-Module providing a function to load files.
+Module to handle file operations for loading configurations.
+
+This module provides functionality to load and parse JSON files, enabling
+retrieval of specific elements based on user-defined keys.
+
+Modules:
+    - json: Parses JSON data.
+    - os: Validates file paths.
+    - logging: Logs error messages and debug information.
 """
 
 import json
@@ -8,7 +16,22 @@ import logging
 
 def load_json_file(path, root_element):
     """
-    Load configurations from the JSON file.
+    Load a specific element from a JSON configuration file.
+
+    This function reads a JSON file from the provided path, parses its content,
+    and retrieves the value corresponding to the specified root element.
+
+    Args:
+        path (str): The file path to the JSON configuration file.
+        root_element (str): The top-level key whose value is to be retrieved.
+
+    Returns:
+        list or None: The value associated with `root_element` in the JSON file
+                      if it exists, or `None` if the file does not exist or the
+                      key is not found.
+
+    Logs:
+        - Error: If the file is not found at the specified path.
     """
     if not os.path.exists(path):
         print(f"- Error: Configuration file not found at {path}")

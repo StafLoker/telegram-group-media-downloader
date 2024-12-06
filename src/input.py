@@ -1,5 +1,19 @@
 """
-Module providing a function of input
+Input Handling Module.
+
+This module provides functions to gather and validate user input, either manually or
+through configuration files. It ensures data integrity for group names, date ranges,
+and file paths.
+
+Modules:
+    - os: Validates file and directory paths.
+    - datetime: Manages date input and validation.
+    - load_files: Loads configurations from external JSON files.
+
+Functions:
+    - manual_input: Collects user input interactively.
+    - load_config_input: Retrieves parameters from a predefined configuration file.
+    - choose_download_type: Allows the user to choose a download mode.
 """
 
 import os
@@ -10,6 +24,12 @@ from load_files import load_json_file
 def __display_results(group_name, start_date, end_date, save_path):
     """
     Display the current inputs for user confirmation.
+
+    Args:
+        group_name (str): Name of the Telegram group.
+        start_date (str): Start date in 'dd-mm-yyyy' format.
+        end_date (str): End date in 'dd-mm-yyyy' format.
+        save_path (str): Directory path where files will be saved.
     """
     print("\nPlease confirm the following details:")
     print(f"1. Group Name: {group_name}")
@@ -31,7 +51,13 @@ def __input_validate_group_name():
 
 def __input_validate_date(prompt):
     """
-    Prompt the user for a date and validate the format is 'dd-mm-yyyy'.
+    Prompt the user for a date and validate its format ('dd-mm-yyyy').
+
+    Args:
+        prompt (str): The message to display when requesting input.
+
+    Returns:
+        datetime: Parsed date object.
     """
     while True:
         date_input = input(prompt).strip()
@@ -44,6 +70,9 @@ def __input_validate_date(prompt):
 def __input_validate_save_path():
     """
     Prompt the user for a directory path and validate it exists.
+
+    Returns:
+        str: Validated directory path.
     """
     while True:
         save_path = input(
@@ -56,6 +85,16 @@ def __input_validate_save_path():
 def __update_parameters(choice, group_name, start_date_obj, end_date_obj, save_path):
     """
     Allow the user to update a specific parameter based on their choice.
+
+    Args:
+        choice (int): Parameter choice (1: Group Name, 2: Start Date, 3: End Date, 4: Save Path).
+        group_name (str): Current group name.
+        start_date_obj (datetime): Current start date.
+        end_date_obj (datetime): Current end date.
+        save_path (str): Current save path.
+
+    Returns:
+        tuple: Updated values (group_name, start_date_obj, end_date_obj, save_path).
     """
     match choice:
         case 1:
@@ -78,7 +117,16 @@ def __update_parameters(choice, group_name, start_date_obj, end_date_obj, save_p
 
 def __while_input(group_name, start_date_obj, end_date_obj, save_path):
     """
-    Prompt the user for correct information
+    Validate user-provided information and allow corrections if necessary.
+
+    Args:
+        group_name (str): Current group name.
+        start_date_obj (datetime): Current start date.
+        end_date_obj (datetime): Current end date.
+        save_path (str): Current save path.
+
+    Returns:
+        tuple: Confirmed and possibly updated values.
     """
     while True:
         __display_results(group_name, start_date_obj.strftime(
@@ -109,7 +157,10 @@ def __while_input(group_name, start_date_obj, end_date_obj, save_path):
 
 def choose_download_type():
     """
-    Prompt the user for input choose download type.
+    Prompt the user to choose the download type.
+
+    Returns:
+        int: Option selected by the user (1: General, 2: Group by theme).
     """
     print("\nChoose download type an option:")
     print("1. General")
@@ -129,7 +180,10 @@ def choose_download_type():
 
 def manual_input():
     """
-    Prompt the user for input manually.
+    Collect all required input manually from the user.
+
+    Returns:
+        tuple: Parameters (group_name, start_date_obj, end_date_obj, save_path).
     """
     group_name = __input_validate_group_name()
     start_date_obj = __input_validate_date(
@@ -151,7 +205,10 @@ def manual_input():
 
 def load_config_input():
     """
-    Prompt the user to choose a config from the file.
+    Retrieve input parameters from a configuration file.
+
+    Returns:
+        tuple: Parameters (group_name, start_date_obj, end_date_obj, save_path).
     """
     id_obj = 1
     configs = load_json_file("data/configs.json", "configs")

@@ -1,5 +1,10 @@
 """
-Module providing a function of download content from telegram with `telethon`
+Module for downloading media content from Telegram groups using `telethon`.
+
+This module provides functions to download media files (such as photos) 
+from Telegram groups within a specified date range. Media can be grouped 
+by themes or downloaded generally. It supports progress tracking, 
+directory creation, and filtering messages based on specified restrictions.
 """
 
 import os
@@ -22,7 +27,13 @@ client = TelegramClient('group_media_downloader', api_id, api_hash)
 
 def __sanitize_folder_name(folder_name):
     """
-    Replace characters not allowed in file/folder names with safe equivalents.
+    Replace invalid characters in folder names with underscores.
+
+    Args:
+        folder_name (str): The original folder name.
+
+    Returns:
+        str: The sanitized folder name.
     """
     sanitized_name = re.sub(r'[<>:"/\\|?*]', '_', folder_name)
     return sanitized_name.strip()
@@ -30,7 +41,14 @@ def __sanitize_folder_name(folder_name):
 
 def __is_description_message(message, restrictions):
     """
-    Checks if a message is not considered a description based on the restrictions.
+    Determine if a message qualifies as a description based on restrictions.
+
+    Args:
+        message (telethon.tl.custom.Message): The Telegram message object.
+        restrictions (list): A list of conditions to identify description messages.
+
+    Returns:
+        bool: True if the message qualifies as a description, False otherwise.
     """
     # Have text
     if not message.message:
@@ -44,7 +62,14 @@ def __is_description_message(message, restrictions):
 
 async def __download_media(message, save_path):
     """
-    Download media in message
+    Download media content from a Telegram message.
+
+    Args:
+        message (telethon.tl.custom.Message): The Telegram message containing media.
+        save_path (str): Directory to save the downloaded media.
+
+    Returns:
+        int: 1 if the media was downloaded successfully, 0 otherwise.
     """
     logging.debug("Trying download message: %d, Save path: %s",
                   message.id, save_path)
@@ -62,8 +87,16 @@ async def __download_media(message, save_path):
 
 async def __download_media_general(entity, current_date, next_date, day_folder):
     """
-    Iterate over messages for the specific date
-    General download
+    Download all media from a Telegram group for a specific date.
+
+    Args:
+        entity: The Telegram entity (group or channel) to download from.
+        current_date (datetime): The start date of the download range.
+        next_date (datetime): The end date (exclusive) of the download range.
+        day_folder (str): Directory to save the downloaded media for the day.
+
+    Returns:
+        int: Total number of media files downloaded for the day.
     """
     day_count = 0
 
@@ -78,9 +111,18 @@ async def __download_media_general(entity, current_date, next_date, day_folder):
 
 async def __download_media_specific_group_theme(entity, current_date, date_str, next_date, day_folder, restrictions):
     """
-    Iterate over messages for the specific date
-    Specific download - group by theme
-    Message timeline - group = {[photos] [description]}
+    Download media grouped by themes for a specific date.
+
+    Args:
+        entity: The Telegram entity (group or channel) to download from.
+        current_date (datetime): The start date of the download range.
+        date_str (str): The formatted date string for folder naming.
+        next_date (datetime): The end date (exclusive) of the download range.
+        day_folder (str): Directory to save the grouped media for the day.
+        restrictions (list): Criteria for grouping and filtering messages.
+
+    Returns:
+        int: Total number of media files downloaded for the day.
     """
     day_count = 0
 
@@ -134,7 +176,16 @@ async def __download_media_specific_group_theme(entity, current_date, date_str, 
 
 async def download_all_media(group_name, start_date_obj, end_date_obj, base_path):
     """
-    Download all media in group name in period [start_date, end_date]
+    Download all media from a Telegram group within a specified date range.
+
+    Args:
+        group_name (str): Name of the Telegram group or channel.
+        start_date_obj (datetime): Start date for media download.
+        end_date_obj (datetime): End date for media download.
+        base_path (str): Directory where media files will be saved.
+
+    Returns:
+        None
     """
     try:
         await client.start()
