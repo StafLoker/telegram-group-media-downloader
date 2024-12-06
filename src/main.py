@@ -17,8 +17,8 @@ Functions:
 
 import logging
 import asyncio
-from input import get_input_from_config, get_manual_input
-from download import download_media_from_group
+from user_input import get_input_from_config, get_manual_input
+from downloader import download_media_from_group
 
 # Configure logging
 logging.basicConfig(

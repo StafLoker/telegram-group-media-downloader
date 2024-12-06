@@ -18,7 +18,7 @@ Functions:
 
 import os
 from datetime import datetime
-from load_files import read_json_config
+from file_loader import read_json_config
 
 
 def __show_input_summary(group_name, start_date, end_date, save_path):

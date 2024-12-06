@@ -13,8 +13,8 @@ import logging
 from datetime import datetime, timedelta
 from telethon.sync import TelegramClient
 from dotenv import load_dotenv
-from input import select_download_mode
-from load_files import read_json_config
+from user_input import select_download_mode
+from file_loader import read_json_config
 
 # Load environment variables
 load_dotenv()
