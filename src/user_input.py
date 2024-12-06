@@ -8,12 +8,12 @@ and file paths.
 Modules:
     - os: Validates file and directory paths.
     - datetime: Manages date input and validation.
-    - load_files: Loads configurations from external JSON files.
+    - file_loader: Loads configurations from external JSON files.
 
 Functions:
-    - manual_input: Collects user input interactively.
-    - load_config_input: Retrieves parameters from a predefined configuration file.
-    - choose_download_type: Allows the user to choose a download mode.
+    - get_manual_input: Collects user input interactively.
+    - get_input_from_config: Retrieves parameters from a predefined configuration file.
+    - select_download_mode: Allows the user to choose a download mode.
 """
 
 import os

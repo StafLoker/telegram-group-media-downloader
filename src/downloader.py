@@ -9,15 +9,14 @@ directory creation, and filtering messages based on specified restrictions.
 
 import os
 import re
-import logging
 from datetime import datetime, timedelta
 from telethon.sync import TelegramClient
-from dotenv import load_dotenv
+from logger_config import setup_logging
 from user_input import select_download_mode
 from file_loader import read_json_config
 
-# Load environment variables
-load_dotenv()
+# Configure logging
+logging = setup_logging()
 
 # Set up Telegram API credentials
 api_id = os.getenv('API_ID')
@@ -53,12 +52,13 @@ def __is_valid_description(message, restrictions):
     # Have text
     if not message.message:
         return False
-    
+
     # Have prohibit text
     for prohibit in restrictions[0].get('notDescriptionMessage', []):
         if prohibit in message.message:
             return False
     return True
+
 
 async def __save_media(message, save_path):
     """
@@ -102,12 +102,14 @@ async def __process_general_download(entity, current_date, next_date, day_folder
 
     async for message in client.iter_messages(entity, offset_date=current_date, reverse=True):
         if message.date.replace(tzinfo=None) < next_date:
-            logging.debug("Message: id: %s, date: %s, message: %s, media: %s", message.id, message.date, message.message, message.media)
+            logging.debug("Message: id: %s, date: %s, message: %s, media: %s",
+                          message.id, message.date, message.message, message.media)
             day_count += await __save_media(message, save_path=day_folder)
         else:
             break
 
     return day_count
+
 
 async def __process_theme_grouped_download(entity, current_date, date_str, next_date, day_folder, restrictions):
     """
@@ -128,12 +130,13 @@ async def __process_theme_grouped_download(entity, current_date, date_str, next_
 
     logging.debug("Create new empty group")
     photo_group = []
-    description_message : str = None
+    description_message: str = None
 
     async for message in client.iter_messages(entity, offset_date=current_date, reverse=True):
         # Process messages only current date
         if message.date.replace(tzinfo=None) < next_date:
-            logging.debug("Message: id: %s, date: %s, message: %s, media: %s", message.id, message.date, message.message, message.media)
+            logging.debug("Message: id: %s, date: %s, message: %s, media: %s",
+                          message.id, message.date, message.message, message.media)
             # Filter messages
             if message.media and hasattr(message.media, 'photo'):
                 if not message.message:
@@ -144,7 +147,7 @@ async def __process_theme_grouped_download(entity, current_date, date_str, next_
                     logging.debug("--- Add photo to group: %d", message.id)
                     description_message = message.message
                     logging.debug(
-                            "--- Found description message of group: %d", message.id)
+                        "--- Found description message of group: %d", message.id)
             elif __is_valid_description(message, restrictions) and photo_group:
                 description_message = message.message
                 logging.debug(
@@ -208,7 +211,8 @@ async def download_media_from_group(group_name, start_date_obj, end_date_obj, ba
         current_date = start_date_obj
 
         # Load restrictions
-        restrictions = read_json_config("data/restrictions.json", "restrictions")
+        restrictions = read_json_config(
+            "data/restrictions.json", "restrictions")
         if restrictions is None:
             print("- Error: No restrictions available.")
             if choose == 2:
@@ -255,8 +259,10 @@ async def download_media_from_group(group_name, start_date_obj, end_date_obj, ba
             # Progress bar print
             completed_days += 1
             progress_percentage = int((completed_days / total_days) * 100)
-            bar = f"[{'#' * (progress_percentage // 2)}{'-' * (50 - (progress_percentage // 2))}] {progress_percentage}%"
-            print(f"\r{"Downloading..." if progress_percentage < 100 else "Downloaded:"} {bar}", end='')
+            bar = f"[{'#' * (progress_percentage // 2)}{'-' * (50 -
+                                                               (progress_percentage // 2))}] {progress_percentage}%"
+            print(f"\r{"Downloading..." if progress_percentage <
+                  100 else "Downloaded:"} {bar}", end='')
 
         print(f"\n\nTotal media files downloaded: {total_downloaded}")
         logging.info("Total media files downloaded: %d", total_downloaded)

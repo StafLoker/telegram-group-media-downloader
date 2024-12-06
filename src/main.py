@@ -6,28 +6,27 @@ load a configuration file or manually input parameters for downloading media
 from a specified Telegram group within a date range.
 
 Modules:
-    - logging: Configures logging to capture events and errors.
-    - asyncio: Manages asynchronous tasks.
-    - input: Handles user input, either via configuration files or manual entry.
-    - download: Provides the functionality to download media files.
+    - asyncio: Manages asynchronous operations for downloading media.
+    - dotenv: Loader of environment variables
+    - logger_config: Sets up logging configuration for tracking application activity.
+    - user_input: Handles user input for configuration or manual parameters.
+    - downloader: Manages the actual downloading of media from the Telegram group.
 
 Functions:
     - main(): The main program loop that prompts the user for input and initiates the download process.
 """
 
-import logging
 import asyncio
+from dotenv import load_dotenv
+from logger_config import setup_logging
 from user_input import get_input_from_config, get_manual_input
 from downloader import download_media_from_group
 
 # Configure logging
-logging.basicConfig(
-    level=logging.DEBUG,  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler("telegram_download.log")
-    ]
-)
+logging = setup_logging()
+
+# Load environment variables
+load_dotenv()
 
 
 async def main():

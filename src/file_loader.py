@@ -7,12 +7,14 @@ retrieval of specific elements based on user-defined keys.
 Modules:
     - json: Parses JSON data.
     - os: Validates file paths.
-    - logging: Logs error messages and debug information.
 """
 
 import json
 import os
-import logging
+from logger_config import setup_logging
+
+# Configure logging
+logging = setup_logging()
 
 def read_json_config(path, root_element):
     """
